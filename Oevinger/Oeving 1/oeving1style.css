@@ -1,0 +1,104 @@
+.header {
+    padding: 1%;
+    text-align: center;
+    background: #6b7782;
+    grid-area: header;
+}
+.footer {
+    grid-area: footer;
+    background-color: #DBCECE;
+}
+.menu {
+    grid-area: menu;
+    padding-right: 25%;
+    padding-left: 10%;
+    background-image: url("1567666.png");
+    color: white;
+}
+.links {
+    color: white;
+    font-family: "Comic Sans MS";
+    text-decoration: none;
+}
+.center {
+    padding-bottom: 35%;
+    grid-area: mainline;
+}
+.grid-container {
+    display: grid;
+    grid-template-areas:
+    'header header header header header header'
+    'mainline mainline mainline mainline menu rightline'
+    'footer footer footer footer footer footer';
+    grid-gap: 1%;
+
+    background-color: #eaeaea;
+    padding: 0px;
+}
+.dropdown {
+    border-style: solid;
+    border-color: black;
+    float: left;
+    overflow: hidden;
+}
+.navbar a:hover, .dropdown:hover .dropbtn {
+    background-color: red;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+/* Add a grey background color to dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown .dropbtn {
+    font-size: 16px;
+    color: black;
+    padding: 14px 16px;
+    background-color: #b0b5b8;
+    font-family: inherit; /* Important for vertical align on mobile phones */
+    margin: 0; /* Important for vertical align on mobile phones */
+}
+
+#logo {
+    display: block;
+    margin-left: 4%;
+    margin-right: auto;
+    max-width: 4%;
+}
+
+.sideline {
+    grid-area: rightline;
+    alignment: right;
+    max-width: 100%;
+    height: auto;
+    background-image: url("Colorful-Plait-Background.jpg");
+}
+#stock {
+    height: auto;
+    width: 600%;
+}
