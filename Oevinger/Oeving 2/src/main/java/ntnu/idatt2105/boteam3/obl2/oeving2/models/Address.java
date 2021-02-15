@@ -3,7 +3,7 @@ package ntnu.idatt2105.boteam3.obl2.oeving2.models;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Address {
-    static private AtomicInteger count = new AtomicInteger(0);
+    static private AtomicInteger count = new AtomicInteger(1);
     private int adr_id;
     private String city;
     private String gateadr;

@@ -50,16 +50,34 @@ public class Oeving2Service {
         repo.removeAuthorById(delAuth.getAuth_id());
     }
 
+    public void addAddress(Address a){
+        if(a!=null){
+            repo.addAddress(a);
+        }
+    }
+
     public void deleteAuthorsByID(int auth_id){
         log.info(String.format("Deleting author by id: %d", auth_id));
         repo.removeAuthorById(auth_id);
+    }
+
+    public void createBook(Book b){
+        repo.newBook(b);
     }
 
     public void addBook(int isbn, int auth_id){
         repo.addBook(isbn, auth_id);
     }
 
-    public Book getBook(int ISBN){
-        return repo.getBook(ISBN);
+    public Book getBook(int isbn){
+        return repo.getBook(isbn);
+    }
+
+    public void addAuthorToBook(int isbn, int auth_id){
+        repo.authorToBook(isbn, auth_id);
+    }
+
+    public void changeAddress(int newId){
+        repo.editAddress(newId);
     }
 }
