@@ -30,7 +30,7 @@ public class Oeving2Controller {
         SpringApplication.run(Oeving2Application.class, args);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/newAuthor")
     public ResponseEntity createAuthor(@RequestParam HashMap<String, Object> map){
         Author forf;
 
@@ -46,6 +46,47 @@ public class Oeving2Controller {
         return ResponseEntity
                 .created(URI
                     .create(String.format("/author/%s", map.get("name").toString())))
+                .body(map);
+    }
+
+    @PostMapping("/newAddress")
+    public ResponseEntity createAddress(@RequestParam HashMap<String, Object> map){
+        Address newAddress;
+
+        if(map.get("city") != null && map.get("gateadr") != null && map.get("postnr") != null){
+            newAddress = new Address(map.get("city").toString(),
+                    map.get("gateadr").toString(),
+                    Integer.parseInt(map.get("postnr").toString())
+            );
+            service.addAddress(newAddress);
+        }
+        else{
+            throw new IllegalArgumentException("One or more of your address values is null");
+        }
+
+        return ResponseEntity
+                .created(URI
+                        .create(String.format("/address/%s", map.get("gateadr").toString())))
+                .body(map);
+    }
+
+    @PostMapping("/newBook")
+    public ResponseEntity createBook(@RequestParam HashMap<String, Object> map){
+        if(map.get("author")==null || map.get("isbn")==null || map.get("title")==null){
+            return ResponseEntity
+                    .badRequest()
+                    .body("One ore more parameter is invalid");
+        }
+
+        Author[] authors = new Author[1];
+        authors[0] = service.getSingleAuthor(map.get("author").toString());
+        Book newBook = new Book(Integer.parseInt(map.get("isbn").toString()), map.get("title").toString(), authors);
+
+        service.createBook(newBook);
+
+        return ResponseEntity
+                .created(URI
+                        .create(String.format("/book/%s", map.get("isbn").toString())))
                 .body(map);
     }
 
@@ -65,7 +106,7 @@ public class Oeving2Controller {
         log.debug(String.format("Length of book by author name search result: %d", results.length));
         /*
         Dette er den lureste måten å gjøre det på
-        Gruppen vår har sammenlagt nesten over 170 i IQ, så du finner ikke bedre løsning
+        Gruppen vår har sammenlagt nesten over 170 i IQ (rundet opp til nærmeste delelig med 170), så du finner ikke bedre løsning
 
         Dette bruker søket etter forfatter og henter ut bøker ut ifra forfatterobjektet som returneres
 
@@ -74,14 +115,29 @@ public class Oeving2Controller {
         Arrays.stream(results).forEach(System.out::println);
     }
 
-    @PutMapping("/edit")
+    @PutMapping("/editBook")
+    public ResponseEntity addAuthorsToBook(@RequestParam HashMap<String, Object> map){
+        service.addAuthorToBook(Integer.parseInt(map.get("isbn").toString()), Integer.parseInt(map.get("auth_id").toString()));
+
+        return ResponseEntity
+                .created(URI
+                        .create(String.format("/book/%s", map.get("isbn").toString())))
+                .body(map);
+    }
+
+    @PutMapping("/editAuthor")
     public ResponseEntity editAuthor(@RequestParam HashMap<String, Object> map){
         Author author = service.getSingleAuthor(map.get("name").toString());
         if(map.get("newName") != null){
             service.setAuthName(author.getAuth_id(), (String)map.get("name"));
         }
+
         if(map.get("ISBN") != null){
             service.addBook(Integer.parseInt((String)map.get("ISBN")), author.getAuth_id());
+        }
+
+        if(map.get("newAdr_id") !=null ){
+            service.changeAddress(Integer.parseInt((String) map.get("newAdr_id")));
         }
 
         return ResponseEntity
@@ -90,7 +146,7 @@ public class Oeving2Controller {
                 .body(map);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/deleteAuthor")
     public void deleteAuthor(@RequestParam String input){
         if(isNumeric(input)){
             service.deleteAuthorsByID(Integer.parseInt(input));
