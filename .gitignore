@@ -19,6 +19,7 @@ target/
 *.iml
 *.ipr
 
+/JDBC*exercise/resources/*
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
