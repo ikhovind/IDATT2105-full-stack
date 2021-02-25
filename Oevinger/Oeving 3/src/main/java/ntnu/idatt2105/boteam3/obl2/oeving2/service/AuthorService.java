@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.List;
+
 @Service
 public class AuthorService {
     Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -14,25 +17,24 @@ public class AuthorService {
     @Autowired
     private Oeving2Repo repo;
 
-    public void handleAuthor(Author au){
+    public void handleAuthor(Author au) throws IOException {
         repo.addAuthor(au);
-        repo.addAddress(au.getAddress());
     }
 
-    public void addBook(int isbn, int auth_id){
-        repo.addBook(isbn, auth_id);
+    public void addBooktoAuthor(int isbn, int auth_id){
+        repo.bookToAuthor(isbn, auth_id);
     }
 
     public void setAuthName(int id, String newName){
         repo.changeAuthName(id, newName);
     }
 
-    public Author[] getAuthorsByName(String name){
+    public List<Author> getAuthorsByName(String name){
         return repo.getAuthors(name);
     }
 
     public Author getSingleAuthor(String name){
-        Author[] authors = getAuthorsByName(name);
+        Author[] authors = getAuthorsByName(name).toArray(new Author[0]);
         if(authors.length == 0) throw new IllegalArgumentException("No authors found with that name");
         if(authors.length>1){
             log.error(String.format("Multiple entries for %s were found, please select the right one: ", name));

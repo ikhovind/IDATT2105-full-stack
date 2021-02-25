@@ -1,9 +1,13 @@
 package ntnu.idatt2105.boteam3.obl2.oeving2.models;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Entity
 public class Address {
     static private AtomicInteger count = new AtomicInteger(1);
+    @Id
     private int adr_id;
     private String city;
     private String gateadr;
@@ -16,10 +20,13 @@ public class Address {
         this.postnr = postnr;
     }
 
+    public Address() {
+    }
+
     @Override
     public String toString() {
-        return "Address{" +
-                ", city='" + city + '\'' +
+        return "Address{" + adr_id +
+                ": city='" + city + '\'' +
                 ", gateadr='" + gateadr + '\'' +
                 ", postnr=" + postnr +
                 '}';

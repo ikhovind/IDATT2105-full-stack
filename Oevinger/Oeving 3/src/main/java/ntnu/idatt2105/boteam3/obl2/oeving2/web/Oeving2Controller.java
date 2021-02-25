@@ -16,6 +16,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -37,18 +38,23 @@ public class Oeving2Controller {
     }
 
     @PostMapping("/authors")
-    public ResponseEntity createAuthor(@RequestParam HashMap<String, Object> map){
-        Author forf;
+    public ResponseEntity createAuthor(@RequestParam HashMap<String, Object> map) throws IOException {
+        if (map.get("name")!=null && addressService.findAddress(Integer.parseInt(map.get("adr_id").toString())) != null){
+            Author forf = new Author(map.get("name").toString(), Integer.parseInt(map.get("adr_id").toString()));
+            authorService.handleAuthor(forf);
+        }else{
+            throw new IllegalArgumentException("Address is invalid!!!!!!");
+        }
 
-        if(map.get("name") != null && map.get("city") != null && map.get("gateadr") != null && Integer.parseInt(map.get("postnr").toString()) > 1){
+        /*if(map.get("name") != null && map.get("city") != null && map.get("gateadr") != null && Integer.parseInt(map.get("postnr").toString()) > 1){
             Address adr = new Address(map.get("city").toString(), map.get("gateadr").toString(), Integer.parseInt(map.get("postnr").toString()));
-            forf = new Author(map.get("name").toString(), adr);
+            forf = new Author(map.get("name").toString(), adr)
 
             authorService.handleAuthor(forf);
         }
         else {
             throw new IllegalArgumentException("One or more author parameters contain an invalid value");
-        }
+        }*/
         return ResponseEntity
                 .created(URI
                     .create(String.format("/authors/%s", map.get("name").toString())))
@@ -76,38 +82,49 @@ public class Oeving2Controller {
                 .body(map);
     }
 
+    //TODO Make work
     @PostMapping("/books")
     public ResponseEntity createBook(@RequestParam HashMap<String, Object> map){
         if(map.get("author")==null || map.get("isbn")==null || map.get("title")==null){
             return ResponseEntity
                     .badRequest()
-                    .body("One ore more parameter is invalid");
+                    .body("One or more parameter is invalid");
         }
 
         Author[] authors = new Author[1];
-        authors[0] = authorService.getSingleAuthor(map.get("author").toString());
-        Book newBook = new Book(Integer.parseInt(map.get("isbn").toString()), map.get("title").toString(), authors);
+        Author temp = authorService.getSingleAuthor(map.get("author").toString());
+        if(temp!=null){
+            authors[0] = temp;
+            Book newBook = new Book(Integer.parseInt(map.get("isbn").toString()), map.get("title").toString(), Arrays.asList(authors));
 
-        bookService.createBook(newBook);
+            bookService.createBook(newBook);
 
+            return ResponseEntity
+                    .created(URI
+                            .create(String.format("/book/%s", map.get("isbn").toString())))
+                    .body(map);
+        }
+
+        log.error(String.format("Author not found"));
         return ResponseEntity
-                .created(URI
-                        .create(String.format("/book/%s", map.get("isbn").toString())))
+                .badRequest()
                 .body(map);
     }
 
+    //TODO Make work
     @GetMapping("/authors")
     public void search(@RequestParam String name){
         log.info(String.format("Search for authors with name: %s", name));
-        Author[] result = authorService.getAuthorsByName(name);
+        Author[] result = authorService.getAuthorsByName(name).toArray(new Author[0]);
         log.debug(String.format("number of Authors found %d", result.length));
         Arrays.stream(result).forEach(System.out::println);
     }
 
+    //TODO Make work
     @GetMapping("/books")
     public void getBooksByAuthor(@RequestParam String name){
         log.info(String.format("Search for books written by authors with name: %s", name));
-        Book[] results = Arrays.stream(authorService.getAuthorsByName(name)).map(Author::getBooks)
+        /*Book[] results = Arrays.stream(Arrays.stream(authorService.getAuthorsByName(name).toArray()).map(Author::getBooks)
                 .flatMap(Arrays::stream).toArray(Book[]::new);
         log.debug(String.format("Length of book by author name search result: %d", results.length));
         /*
@@ -117,10 +134,12 @@ public class Oeving2Controller {
         Dette bruker søket etter forfatter og henter ut bøker ut ifra forfatterobjektet som returneres
 
         på denne måten så slipper vi å ha en dedikert metode som itererer over alle bøkene og henter ut de med relevant navn (både ineffektivt OG overflødig!)
-         */
+
         Arrays.stream(results).forEach(System.out::println);
+        */
     }
 
+    //TODO Make work
     @PutMapping("/books")
     public ResponseEntity addAuthorsToBook(@RequestParam HashMap<String, Object> map){
         bookService.addAuthorToBook(Integer.parseInt(map.get("isbn").toString()), Integer.parseInt(map.get("auth_id").toString()));
@@ -131,6 +150,7 @@ public class Oeving2Controller {
                 .body(map);
     }
 
+    //TODO Make work
     @PutMapping("/authors")
     public ResponseEntity editAuthor(@RequestParam HashMap<String, Object> map){
         Author author = authorService.getSingleAuthor(map.get("name").toString());
@@ -139,7 +159,7 @@ public class Oeving2Controller {
         }
 
         if(map.get("ISBN") != null){
-            authorService.addBook(Integer.parseInt((String)map.get("ISBN")), author.getAuth_id());
+            authorService.addBooktoAuthor(Integer.parseInt((String)map.get("ISBN")), author.getAuth_id());
         }
 
         if(map.get("newAdr_id") !=null ){
@@ -152,6 +172,7 @@ public class Oeving2Controller {
                 .body(map);
     }
 
+    //TODO Make work
     @DeleteMapping("/authors")
     public void deleteAuthor(@RequestParam String input){
         if(isNumeric(input)){
