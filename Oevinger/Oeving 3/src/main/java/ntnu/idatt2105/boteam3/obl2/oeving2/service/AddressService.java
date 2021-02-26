@@ -23,9 +23,9 @@ public class AddressService {
         }
     }
 
-    public void changeAddress(int newId){
+    public void changeAddress(int newId, int auth_id){
         log.debug(String.format("Editing address with id %d", newId));
-        repo.editAddress(newId);
+        repo.editAuthorAddress(newId, auth_id);
     }
 
     public Address findAddress(int adr_id){

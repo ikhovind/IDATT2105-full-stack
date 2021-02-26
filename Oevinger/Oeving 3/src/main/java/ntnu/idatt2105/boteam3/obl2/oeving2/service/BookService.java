@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 @Service
 public class BookService {
     Logger log = LoggerFactory.getLogger(this.getClass().getName());
@@ -22,7 +23,12 @@ public class BookService {
         return repo.getBook(isbn);
     }
 
+    public List<Book> getBooksByAuthors(int authID){
+        return repo.getBooksByAuthor(authID);
+    }
+
     public void addAuthorToBook(int isbn, int auth_id){
+        log.info(String.format("Adding author with id %d to book %d", auth_id, isbn));
         repo.authorToBook(isbn, auth_id);
     }
 }

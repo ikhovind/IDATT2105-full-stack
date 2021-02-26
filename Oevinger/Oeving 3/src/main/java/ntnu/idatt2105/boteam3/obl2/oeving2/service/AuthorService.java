@@ -21,10 +21,6 @@ public class AuthorService {
         repo.addAuthor(au);
     }
 
-    public void addBooktoAuthor(int isbn, int auth_id){
-        repo.bookToAuthor(isbn, auth_id);
-    }
-
     public void setAuthName(int id, String newName){
         repo.changeAuthName(id, newName);
     }

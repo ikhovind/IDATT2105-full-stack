@@ -16,11 +16,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-
+import java.util.*;
 import java.net.URI;
+
 
 @RestController
 public class Oeving2Controller {
@@ -39,10 +39,10 @@ public class Oeving2Controller {
 
     @PostMapping("/authors")
     public ResponseEntity createAuthor(@RequestParam HashMap<String, Object> map) throws IOException {
-        if (map.get("name")!=null && addressService.findAddress(Integer.parseInt(map.get("adr_id").toString())) != null){
+        if (map.get("name") != null && addressService.findAddress(Integer.parseInt(map.get("adr_id").toString())) != null) {
             Author forf = new Author(map.get("name").toString(), Integer.parseInt(map.get("adr_id").toString()));
             authorService.handleAuthor(forf);
-        }else{
+        } else {
             throw new IllegalArgumentException("Address is invalid!!!!!!");
         }
 
@@ -57,22 +57,21 @@ public class Oeving2Controller {
         }*/
         return ResponseEntity
                 .created(URI
-                    .create(String.format("/authors/%s", map.get("name").toString())))
+                        .create(String.format("/authors/%s", map.get("name").toString())))
                 .body(map);
     }
 
     @PostMapping("/addresses")
-    public ResponseEntity createAddress(@RequestParam HashMap<String, Object> map){
+    public ResponseEntity createAddress(@RequestParam HashMap<String, Object> map) {
         Address newAddress;
 
-        if(map.get("city") != null && map.get("gateadr") != null && map.get("postnr") != null){
+        if (map.get("city") != null && map.get("gateadr") != null && map.get("postnr") != null) {
             newAddress = new Address(map.get("city").toString(),
                     map.get("gateadr").toString(),
                     Integer.parseInt(map.get("postnr").toString())
             );
             addressService.addAddress(newAddress);
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("One or more of your address values is null");
         }
 
@@ -82,48 +81,51 @@ public class Oeving2Controller {
                 .body(map);
     }
 
-    //TODO Make work
     @PostMapping("/books")
-    public ResponseEntity createBook(@RequestParam HashMap<String, Object> map){
-        if(map.get("author")==null || map.get("isbn")==null || map.get("title")==null){
+    public ResponseEntity createBook(@RequestBody HashMap<String, Object> map) {
+
+        if (map.get("isbn") == null || map.get("title") == null) {
             return ResponseEntity
                     .badRequest()
                     .body("One or more parameter is invalid");
         }
 
-        Author[] authors = new Author[1];
-        Author temp = authorService.getSingleAuthor(map.get("author").toString());
-        if(temp!=null){
-            authors[0] = temp;
-            Book newBook = new Book(Integer.parseInt(map.get("isbn").toString()), map.get("title").toString(), Arrays.asList(authors));
+        List<Author> emptyAuthors = new ArrayList<Author>();
 
-            bookService.createBook(newBook);
+        Book newBook = new Book(Integer.parseInt(map.get("isbn").toString()), map.get("title").toString(), emptyAuthors);
 
-            return ResponseEntity
-                    .created(URI
-                            .create(String.format("/book/%s", map.get("isbn").toString())))
-                    .body(map);
-        }
+        bookService.createBook(newBook);
 
-        log.error(String.format("Author not found"));
         return ResponseEntity
-                .badRequest()
+                .created(URI
+                        .create(String.format("/book/%s", map.get("isbn").toString())))
                 .body(map);
     }
 
-    //TODO Make work
     @GetMapping("/authors")
-    public void search(@RequestParam String name){
+    public ResponseEntity authorNameSearch(@RequestParam String name) {
         log.info(String.format("Search for authors with name: %s", name));
-        Author[] result = authorService.getAuthorsByName(name).toArray(new Author[0]);
-        log.debug(String.format("number of Authors found %d", result.length));
-        Arrays.stream(result).forEach(System.out::println);
+        List<Author> result = authorService.getAuthorsByName(name);
+        if(result==null){
+            log.error("No authors found!");
+        }
+        log.debug(String.format("number of Authors found %d", result.size()));
+        result.forEach(System.out::println);
+        return ResponseEntity
+                .created(URI
+                        .create(String.format("/author/%s", name)))
+                .body(result);
     }
 
-    //TODO Make work
     @GetMapping("/books")
-    public void getBooksByAuthor(@RequestParam String name){
-        log.info(String.format("Search for books written by authors with name: %s", name));
+    public ResponseEntity getBooksByAuthor(@RequestParam int auth_id) {
+
+        List<Book> restults = bookService.getBooksByAuthors(auth_id);
+        log.info(String.format("Search for books written by authors with id: %s", auth_id));
+        return ResponseEntity
+                .created(URI
+                        .create(String.format("/books/authors/%d", auth_id)))
+                .body(restults);
         /*Book[] results = Arrays.stream(Arrays.stream(authorService.getAuthorsByName(name).toArray()).map(Author::getBooks)
                 .flatMap(Arrays::stream).toArray(Book[]::new);
         log.debug(String.format("Length of book by author name search result: %d", results.length));
@@ -139,56 +141,60 @@ public class Oeving2Controller {
         */
     }
 
-    //TODO Make work
-    @PutMapping("/books")
-    public ResponseEntity addAuthorsToBook(@RequestParam HashMap<String, Object> map){
-        bookService.addAuthorToBook(Integer.parseInt(map.get("isbn").toString()), Integer.parseInt(map.get("auth_id").toString()));
+    @PutMapping("/books/{isbn}")
+    public ResponseEntity addAuthorsToBook(@PathVariable String isbn, @RequestBody HashMap<String, Object> map) {
+        System.out.println("isbn: " + isbn);
+        System.out.println("author " + map.get("auth_id"));
+        bookService.addAuthorToBook(Integer.parseInt(isbn), Integer.parseInt(map.get("auth_id").toString()));
 
         return ResponseEntity
                 .created(URI
-                        .create(String.format("/book/%s", map.get("isbn").toString())))
+                        .create(String.format("/book/%s", isbn)))
                 .body(map);
     }
 
-    //TODO Make work
-    @PutMapping("/authors")
-    public ResponseEntity editAuthor(@RequestParam HashMap<String, Object> map){
-        Author author = authorService.getSingleAuthor(map.get("name").toString());
-        if(map.get("newName") != null){
-            authorService.setAuthName(author.getAuth_id(), (String)map.get("name"));
+    @PutMapping("/authors/{id}")
+    public ResponseEntity editAuthor(@PathVariable String id, @RequestParam HashMap<String, Object> map) {
+        if (map.get("newName") != null) {
+            authorService.setAuthName(Integer.parseInt(id), (String) map.get("newName"));
         }
 
-        if(map.get("ISBN") != null){
-            authorService.addBooktoAuthor(Integer.parseInt((String)map.get("ISBN")), author.getAuth_id());
+        if (map.get("ISBN") != null) {
+            bookService.addAuthorToBook(Integer.parseInt(map.get("ISBN").toString()), Integer.parseInt(id));
         }
 
-        if(map.get("newAdr_id") !=null ){
-            addressService.changeAddress(Integer.parseInt((String) map.get("newAdr_id")));
+        if (map.get("newAdr_id") != null) {
+            addressService.changeAddress(Integer.parseInt((String) map.get("newAdr_id")), Integer.parseInt(id));
         }
 
         return ResponseEntity
                 .created(URI
-                        .create(String.format("/author/%s", map.get("name").toString())))
+                        .create(String.format("/author/%d", Integer.parseInt(id))))
                 .body(map);
     }
 
-    //TODO Make work
-    @DeleteMapping("/authors")
-    public void deleteAuthor(@RequestParam String input){
-        if(isNumeric(input)){
+    @DeleteMapping("/authors/{id}")
+    public void deleteAuthor(@PathVariable String input) {
+        if (isNumeric(input)) {
             authorService.deleteAuthorsByID(Integer.parseInt(input));
-        }else{
+        } else {
             authorService.deleteAuthorsByName(input);
         }
     }
 
-    private static boolean isNumeric(String strNum){
-        if(strNum == null){
+    @GetMapping("/testing")
+    private void testBook() {
+        System.out.println(bookService.getBook(123));
+        System.out.println(bookService.getBook(51234));
+    }
+
+    private static boolean isNumeric(String strNum) {
+        if (strNum == null) {
             return false;
         }
-        try{
+        try {
             int i = Integer.parseInt(strNum);
-        }catch(NumberFormatException nfe){
+        } catch (NumberFormatException nfe) {
             return false;
         }
         return true;

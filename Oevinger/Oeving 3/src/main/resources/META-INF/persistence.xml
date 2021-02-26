@@ -8,7 +8,6 @@
         <class>ntnu.idatt2105.boteam3.obl2.oeving2.models.Address</class>
         <class>ntnu.idatt2105.boteam3.obl2.oeving2.models.Book</class>
         <class>ntnu.idatt2105.boteam3.obl2.oeving2.models.Author</class>
-        <class>ntnu.idatt2105.boteam3.obl2.oeving2.models.AUTHOR_BOOK</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="create-tables" />
             <property name="eclipselink.ddl-generation.output-mode" value="database" />

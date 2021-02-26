@@ -3,6 +3,9 @@ package ntnu.idatt2105.boteam3.obl2.oeving2.models;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+/**
+ * DEPCRECATED! DO NOT USE!
+ */
 @Entity
 public class AUTHOR_BOOK {
     @Id

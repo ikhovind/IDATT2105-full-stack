@@ -22,7 +22,11 @@ public class Book {
         this.authors = authors;
     }
 
-    public Book(){
+    public Book() {
+    }
+
+    public void addAuthor(Author a){
+        authors.add(a);
     }
 
     public int getIsbn() {
@@ -47,5 +51,14 @@ public class Book {
 
     public void setAuthors(List<Author> authors) {
         this.authors = authors;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "isbn=" + isbn +
+                ", tittel='" + tittel + '\'' +
+                ", authors=" + authors +
+                '}';
     }
 }
