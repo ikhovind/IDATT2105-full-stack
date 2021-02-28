@@ -25,6 +25,9 @@ public class AuthorService {
         repo.changeAuthName(id, newName);
     }
 
+    public List<Author> getAllAuthors(){
+        return repo.getAllAuthors();
+    }
     public List<Author> getAuthorsByName(String name){
         return repo.getAuthors(name);
     }

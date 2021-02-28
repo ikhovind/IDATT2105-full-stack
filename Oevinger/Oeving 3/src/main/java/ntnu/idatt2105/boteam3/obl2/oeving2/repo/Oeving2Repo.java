@@ -153,7 +153,7 @@ public class Oeving2Repo {
         }finally {
             em.close();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public Author getAuthorById(int auth_id){
@@ -222,6 +222,7 @@ public class Oeving2Repo {
 
     public Book getBook(int ISBN){
         EntityManager em = emf.createEntityManager();
+
         try{
             Query q = em.createQuery("SELECT OBJECT(b) FROM Book b WHERE b.isbn = '" + ISBN + "'");
             System.out.println(q);
@@ -266,5 +267,19 @@ public class Oeving2Repo {
         }finally{
             em.close();
         }
+    }
+
+    public List<Author> getAllAuthors() {
+        EntityManager em = emf.createEntityManager();
+        try{
+            Query q = em.createQuery("SELECT OBJECT(a) FROM Author a");
+            List<Author> results = q.getResultList();
+            return results;
+        }catch(NoResultException e){
+            log.error(String.format("The request returned error %s", e.toString()));
+        } finally{
+            em.close();
+        }
+        return null;
     }
 }

@@ -33,12 +33,42 @@ public class Oeving2Controller {
     @Autowired
     private BookService bookService;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Oeving2Application.class, args);
+    public void init(){
+
+    }
+
+    @GetMapping("/authors")
+    public ResponseEntity authorNameSearch(@RequestParam(required = false) String name) {
+        System.out.println(name);
+        if(name==null){
+            log.info(String.format("Getting all authors"));
+            List<Author> result = authorService.getAllAuthors();
+            return ResponseEntity
+                    .accepted()
+                    .body(result);
+        }
+
+        log.info(String.format("Search for authors with name: %s", name));
+        List<Author> result = authorService.getAuthorsByName(name);
+        if(result==null){
+            log.error("No authors found!");
+        }
+        int size = 0;
+        if (result!=null && !result.isEmpty()){
+            size = result.size();
+        }
+
+        log.debug(String.format("number of Authors found %d", size));
+        result.forEach(System.out::println);
+        return ResponseEntity
+                .created(URI
+                        .create(String.format("/author/%s", name)))
+                .body(result);
     }
 
     @PostMapping("/authors")
-    public ResponseEntity createAuthor(@RequestParam HashMap<String, Object> map) throws IOException {
+    public ResponseEntity createAuthor(@RequestBody HashMap<String, Object> map) throws IOException {
+        System.out.println("Name: " + map.get("name") + ", adr_id: " + map.get("adr_id"));
         if (map.get("name") != null && addressService.findAddress(Integer.parseInt(map.get("adr_id").toString())) != null) {
             Author forf = new Author(map.get("name").toString(), Integer.parseInt(map.get("adr_id").toString()));
             authorService.handleAuthor(forf);
@@ -102,29 +132,13 @@ public class Oeving2Controller {
                 .body(map);
     }
 
-    @GetMapping("/authors")
-    public ResponseEntity authorNameSearch(@RequestParam String name) {
-        log.info(String.format("Search for authors with name: %s", name));
-        List<Author> result = authorService.getAuthorsByName(name);
-        if(result==null){
-            log.error("No authors found!");
-        }
-        log.debug(String.format("number of Authors found %d", result.size()));
-        result.forEach(System.out::println);
-        return ResponseEntity
-                .created(URI
-                        .create(String.format("/author/%s", name)))
-                .body(result);
-    }
-
     @GetMapping("/books")
     public ResponseEntity getBooksByAuthor(@RequestParam int auth_id) {
 
         List<Book> restults = bookService.getBooksByAuthors(auth_id);
         log.info(String.format("Search for books written by authors with id: %s", auth_id));
         return ResponseEntity
-                .created(URI
-                        .create(String.format("/books/authors/%d", auth_id)))
+                .ok()
                 .body(restults);
         /*Book[] results = Arrays.stream(Arrays.stream(authorService.getAuthorsByName(name).toArray()).map(Author::getBooks)
                 .flatMap(Arrays::stream).toArray(Book[]::new);
@@ -154,16 +168,16 @@ public class Oeving2Controller {
     }
 
     @PutMapping("/authors/{id}")
-    public ResponseEntity editAuthor(@PathVariable String id, @RequestParam HashMap<String, Object> map) {
-        if (map.get("newName") != null) {
+    public ResponseEntity editAuthor(@PathVariable String id, @RequestBody HashMap<String, Object> map) {
+        if (map.get("newName") != null && !map.get("newName").toString().equals("")) {
             authorService.setAuthName(Integer.parseInt(id), (String) map.get("newName"));
         }
 
-        if (map.get("ISBN") != null) {
+        if (map.get("ISBN") != null && !map.get("ISBN").toString().equals("")) {
             bookService.addAuthorToBook(Integer.parseInt(map.get("ISBN").toString()), Integer.parseInt(id));
         }
 
-        if (map.get("newAdr_id") != null) {
+        if (map.get("newAdr_id") != null && !map.get("ISBN").toString().equals("")) {
             addressService.changeAddress(Integer.parseInt((String) map.get("newAdr_id")), Integer.parseInt(id));
         }
 
@@ -174,12 +188,16 @@ public class Oeving2Controller {
     }
 
     @DeleteMapping("/authors/{id}")
-    public void deleteAuthor(@PathVariable String input) {
-        if (isNumeric(input)) {
-            authorService.deleteAuthorsByID(Integer.parseInt(input));
+    public ResponseEntity deleteAuthor(@PathVariable String id) {
+        if (isNumeric(id)) {
+            authorService.deleteAuthorsByID(Integer.parseInt(id));
         } else {
-            authorService.deleteAuthorsByName(input);
+            authorService.deleteAuthorsByName(id);
         }
+
+        return ResponseEntity
+                .ok()
+                .body(String.format("Deleted user with id %s", id));
     }
 
     @GetMapping("/testing")
