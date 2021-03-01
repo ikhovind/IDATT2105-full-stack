@@ -21,12 +21,12 @@ public class AuthorService {
         repo.addAuthor(au);
     }
 
-    public void addBooktoAuthor(int isbn, int auth_id){
-        repo.bookToAuthor(isbn, auth_id);
-    }
-
     public void setAuthName(int id, String newName){
         repo.changeAuthName(id, newName);
+    }
+
+    public List<Author> getAllAuthors(){
+        return repo.getAllAuthors();
     }
 
     public List<Author> getAuthorsByName(String name){
@@ -34,18 +34,18 @@ public class AuthorService {
     }
 
     public Author getSingleAuthor(String name){
-        Author[] authors = getAuthorsByName(name).toArray(new Author[0]);
-        if(authors.length == 0) throw new IllegalArgumentException("No authors found with that name");
-        if(authors.length>1){
+        List<Author> authors = getAuthorsByName(name);
+        if(authors.size() == 0) throw new IllegalArgumentException("No authors found with that name");
+        if(authors.size()>1){
             log.error(String.format("Multiple entries for %s were found, please select the right one: ", name));
-            for (int i = 0; i < authors.length - 1; i++) {
-                log.info(String.format("%d: %s", i, authors[i]));
+            for (int i = 0; i < authors.size() - 1; i++) {
+                log.info(String.format("%d: %s", i, authors.get(i)));
             }
             int userinput = 1;      //user-input here
-            log.info(String.format("You have chosen author %d: %s", userinput, authors[userinput]));
-            return authors[userinput];
+            log.info(String.format("You have chosen author %d: %s", userinput, authors.get(userinput)));
+            return authors.get(userinput);
         }
-        return authors[0];
+        return authors.get(0);
     }
 
     public void deleteAuthorsByName(String name){

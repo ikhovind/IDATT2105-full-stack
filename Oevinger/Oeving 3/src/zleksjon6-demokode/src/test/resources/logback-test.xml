@@ -1,0 +1,5 @@
+<!-- Dette er kun en fil for å kvele all outputen fra Spring når en kjører tester -->
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <logger name="org.springframework" level="OFF"/>
+</configuration>
