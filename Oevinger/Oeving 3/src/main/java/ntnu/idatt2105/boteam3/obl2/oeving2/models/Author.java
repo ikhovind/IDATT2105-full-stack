@@ -60,4 +60,14 @@ public class Author {
                 ", books=" +
                 '}';
     }
+
+    public boolean equals(Object o){
+        if(o instanceof Author){
+            Author a = (Author) o;
+            return (a.getName() == this.getName()
+                    && a .getAddress() == this.getAddress()
+                    && a.getAuth_id() == this.getAuth_id());
+        }
+        return false;
+    }
 }
