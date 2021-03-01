@@ -1,0 +1,28 @@
+/betyr en identitet
+/books betyr at man henter bok
+/books/id betyr at man henter den spesifikke boken 
+paramter er kun for filtrering 
+	tenk alle bøker som ble utgitt i 2019
+	ikke en egen slash for dette
+	
+params jobber alltid i URL - head i http kall
+body blir kryptert når det blir sendt over http-kall
+
+når data sendes så putt det i body
+
+sletting gjøres med /{id})
+
+get/put/post/delete, put er endring post er å legge til
+
+4 viktigste huskeregler:
+
+	get: kan ha id eller ingen - aldri body men kanskje params
+
+	put: alltid id og alltid body - aldri params
+
+	post:  aldri id og aldri params - alltid body
+
+	delete: aldri params og aldri body - alltid id
+husk alltid flertall
+
+
