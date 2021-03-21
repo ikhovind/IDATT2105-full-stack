@@ -1,19 +1,25 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <Calculator></Calculator>
+    <Calculator v-on:add-calculation="addCalculation"></Calculator>
+    <Log ref="logs"></Log>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import Calculator from "@/components/Calculator";
-export default {
+import Log from "./components/Log";
+
+export default{
   name: 'App',
   components: {
     Calculator,
-    HelloWorld
+    Log,
+  },
+  methods:{
+    addCalculation(equation){
+      this.$refs.logs.addToLog(equation)
+    }
   }
 }
 </script>

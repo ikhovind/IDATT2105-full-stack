@@ -52,6 +52,7 @@ export default {
     },
     equals(){
       try{
+        this.$emit("add-calculation", this.equation + "=" + eval(this.equation))
         this.equation = eval(this.equation)
         this.previousAnswer = parseFloat(this.equation)
       } catch (e) {
