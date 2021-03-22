@@ -10,14 +10,14 @@
 import Calculator from "@/components/Calculator";
 import Log from "./components/Log";
 
-export default{
+export default {
   name: 'App',
   components: {
     Calculator,
     Log,
   },
-  methods:{
-    addCalculation(equation){
+  methods: {
+    addCalculation(equation) {
       this.$refs.logs.addToLog(equation)
     }
   }
@@ -30,7 +30,16 @@ export default{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #393b39;
+  background-color: #1a1919;
+  height: 100%;
+  overflow: auto;
+  padding-top: 150px;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 </style>
