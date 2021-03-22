@@ -59,8 +59,6 @@ export default {
         this.equation = e.toString()
       }
     }
-  },
-  mounted: {
   }
 }
 
@@ -111,6 +109,6 @@ button {
 
 #result {
   margin: auto;
-  max-width: 260px;
+  max-width: 250px;
 }
 </style>

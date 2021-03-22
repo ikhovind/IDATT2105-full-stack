@@ -34,7 +34,7 @@ export default {
   background-color: #1a1919;
   height: 100%;
   overflow: auto;
-  padding-top: 150px;
+  padding-top: 7%;
 }
 
 html, body {
