@@ -60,16 +60,13 @@ export default {
       }
     },
     async calculate() {
-/*
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application-json" },
         body: JSON.stringify({ calculate: this.equation })
       };
 
- */
-
-      await fetch("http://localhost:8081/calculate")
+      const response = await fetch("http://localhost:8081/calculate")
           .then(async response => {
             const data = await response.json();
 
