@@ -21,7 +21,7 @@
       <div></div>
       <button type="button" @click="number">0</button>
       <button type="button" @click="number">.</button>
-      <button type="button" class= "operator" @click="equals">=</button>
+      <button type="button" class= "operator" @click="calculate">=</button>
     </div>
   </div>
 </template>
@@ -60,21 +60,20 @@ export default {
       }
     },
     async calculate() {
-/*
       const requestOptions = {
         method: "POST",
-        headers: { "Content-Type": "application-json" },
-        body: JSON.stringify({ calculate: this.equation })
+        headers: { "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"},
+        body: JSON.stringify({ "calculate": this.equation })
       };
 
- */
-
-      await fetch("http://localhost:8081/calculate")
+      await fetch("http://localhost:8081/calculate", requestOptions)
           .then(async response => {
             const data = await response.json();
 
             if(!response.ok){
               const error = (data && data.result) || response.status;
+              this.equation = data.result;
               return Promise.reject(error);
             }
 
